@@ -8,12 +8,7 @@ USERNAME = os.getenv("INSTAGRAM_USERNAME")
 PASSWORD = os.getenv("INSTAGRAM_PASSWORD")
 
 
-bot = Bot(
-    base_path="./",
-    use_cookie=False,
-    save_logfile=False,
-    save_login=False
-)
+bot = Bot()
 bot.login(username=USERNAME, password=PASSWORD)
 
 

@@ -1,49 +1,49 @@
-import os
-import time
+from instagrapi import Client
+import json, os, time
+import requests
 import schedule
-from instabot import Bot
 
-# Login from environment variables
-USERNAME = os.getenv("INSTAGRAM_USERNAME")
-PASSWORD = os.getenv("INSTAGRAM_PASSWORD")
+USERNAME = os.getenv("IG_USERNAME")
+PASSWORD = os.getenv("IG_PASSWORD")
 
+cl = Client()
+cl.login(USERNAME, PASSWORD)
 
-bot = Bot()
-bot.login(username=USERNAME, password=PASSWORD)
+with open("frame_urls.json") as f:
+    frames = json.load(f)
 
+posted_index = 0
+if os.path.exists("last_posted.txt"):
+    with open("last_posted.txt") as f:
+        posted_index = int(f.read())
 
-FOLDER = "all_frames"
-POST_LOG = "last_posted.txt"
-TOTAL_FRAMES = 3050  # total number of frames
-
-# Load index
-posted = 0
-if os.path.exists(POST_LOG):
-    with open(POST_LOG) as f:
-        posted = int(f.read())
-
-frames = sorted(os.listdir(FOLDER))
+def download_image(url, filename):
+    r = requests.get(url)
+    with open(filename, "wb") as f:
+        f.write(r.content)
 
 def post_next():
-    global posted
-    if posted >= len(frames):
-        print("✅ All frames posted.")
+    global posted_index
+    if posted_index >= len(frames):
+        print("✅ Done posting all frames.")
         return
 
-    frame = frames[posted]
-    path = os.path.join(FOLDER, frame)
-    print(f"📸 Posting {path}...")
+    filename = f"temp.jpg"
+    url = frames[posted_index]
+    download_image(url, filename)
 
-    caption = f"Recep İvedik 1 – Frame #{posted + 1} out of {TOTAL_FRAMES}"
+    caption = f"Recep İvedik 1 - #{posted_index + 1} out of {len(frames)}"
+    cl.photo_upload(path=filename, caption=caption)
 
-    bot.upload_photo(path, caption=caption)
-    posted += 1
+    posted_index += 1
+    with open("last_posted.txt", "w") as f:
+        f.write(str(posted_index))
 
-    with open(POST_LOG, "w") as f:
-        f.write(str(posted))
+    os.remove(filename)
 
+# Post one now and schedule next every 15 min
+post_next()
 schedule.every(15).minutes.do(post_next)
-post_next()  # post one instantly
 
 while True:
     schedule.run_pending()

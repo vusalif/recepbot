@@ -4,8 +4,9 @@ import schedule
 from instabot import Bot
 
 # Login from environment variables
-USERNAME = os.getenv("testframepost")
-PASSWORD = os.getenv("1905Fatihterim")
+USERNAME = os.getenv("INSTAGRAM_USERNAME")
+PASSWORD = os.getenv("INSTAGRAM_PASSWORD")
+
 
 bot = Bot()
 bot.login(username=USERNAME, password=PASSWORD)

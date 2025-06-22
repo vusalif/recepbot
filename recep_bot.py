@@ -8,8 +8,14 @@ USERNAME = os.getenv("INSTAGRAM_USERNAME")
 PASSWORD = os.getenv("INSTAGRAM_PASSWORD")
 
 
-bot = Bot()
+bot = Bot(
+    base_path="./",
+    use_cookie=False,
+    save_logfile=False,
+    save_login=False
+)
 bot.login(username=USERNAME, password=PASSWORD)
+
 
 FOLDER = "all_frames"
 POST_LOG = "last_posted.txt"

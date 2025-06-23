@@ -1,4 +1,3 @@
-instagrapi
+instabot
 schedule
 requests
-Pillow>=8.1.1

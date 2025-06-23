@@ -1,17 +1,17 @@
 from instagrapi import Client
-import json, os, time
+import os
+import time
 import requests
 import schedule
 
-USERNAME = os.getenv("IG_USERNAME")
-PASSWORD = os.getenv("IG_PASSWORD")
-
 cl = Client()
-cl.login(USERNAME, PASSWORD)
+cl.login(os.getenv("IG_USERNAME"), os.getenv("IG_PASSWORD"))
 
-with open("frame_urls.json") as f:
-    frames = json.load(f)
+# Linkləri fayldan oxuyuruq
+with open("drive_links.txt") as f:
+    frames = [line.strip() for line in f if line.strip()]
 
+# Hansı frame-dən başlayırıq, onu saxlayır
 posted_index = 0
 if os.path.exists("last_posted.txt"):
     with open("last_posted.txt") as f:
@@ -25,10 +25,10 @@ def download_image(url, filename):
 def post_next():
     global posted_index
     if posted_index >= len(frames):
-        print("✅ Done posting all frames.")
+        print("✅ Bütün frame-lər paylaşılıb.")
         return
 
-    filename = f"temp.jpg"
+    filename = "temp.jpg"
     url = frames[posted_index]
     download_image(url, filename)
 
@@ -41,7 +41,7 @@ def post_next():
 
     os.remove(filename)
 
-# Post one now and schedule next every 15 min
+# İndi paylaşırıq və 15 dəqiqəlik schedule qururuq
 post_next()
 schedule.every(15).minutes.do(post_next)
 
